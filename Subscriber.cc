@@ -5,7 +5,7 @@ using namespace std;
 #include "Subscriber.h"
 
 //consturctor to initialize member variables
-Subscriber::Subscriber(string name, string creditcard){
+Subscriber::Subscriber(const string& name, const string& creditcard){
 
 }
 

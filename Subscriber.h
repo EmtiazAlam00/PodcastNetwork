@@ -4,7 +4,7 @@
 class Subscriber{
     public:
     //Two argument constructor
-    Subscriber(string name, string creaditcard);
+    Subscriber(const string& name, const string& creaditcard);
     //functions
     bool matches(const string& name);
     void print();
