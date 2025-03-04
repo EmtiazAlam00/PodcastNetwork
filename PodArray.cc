@@ -17,7 +17,10 @@ PodArray::PodArray(PodArray& pa){
 
 
 PodArray::~PodArray(){
-	
+	for(int i = 0; i < numPods; ++i){
+		delete podcasts[i];
+	}
+	delete[] podcasts;
 }
 
 bool PodArray::addPodcast(Podcast* p){
@@ -27,7 +30,7 @@ bool PodArray::addPodcast(Podcast* p){
 			podcasts[i] = podcasts[i-1];
 		}else{
 			podcasts[i] = p;
-			++numPods;
+			++numPods; 
 			return true;
 		}
 	}
@@ -37,12 +40,29 @@ bool PodArray::addPodcast(Podcast* p){
 }
 
 bool PodArray::removePodcast(const string& title, Podcast** pod){
+	for (int i = 0; i < numPods; ++i){
+		if (podcasts[i]->getTitle() == title){
+			*pod = podcasts[i];
+			for (int j = i; j < numPods - 1; ++j){
+				podcasts[j] = podcasts[j+1];
+			}
+			podcasts[numPods-1] = nullptr;
+			--numPods;
+			return true;
+		}
+	}
 	return false;
 }
 
 bool PodArray::getPodcast(const string& title, Podcast** pod){
+	for (int i = 0; i < numPods; ++i){
+		if (podcasts[i]->getTitle() == title){
+			*pod = podcasts[i];
+			return true;
+		}
+	}
 	return false;
-}
+}	
 
 bool PodArray::isFull(){
 	return numPods >= MAX_PODS;
