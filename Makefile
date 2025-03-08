@@ -1,34 +1,69 @@
-objects = main.o TestView.o TestControl.o Client.o Network.o Subscriber.o Podcast.o Episode.o PodArray.o
+########################################################################
+####################### Makefile Template ##############################
+########################################################################
 
-a2: $(objects)
-	g++ -o a2 $(objects)
+# Compiler settings - Can be customized.
+CC = g++
+CXXFLAGS = -std=c++11 -Wall
+LDFLAGS = 
 
-main.o: main.cc TestControl.o
-	g++ -c main.cc 
+# Makefile settings - Can be customized.
+APPNAME = Podcast
+EXT = .cc
+SRCDIR = C:\Users\emtia\Downloads\PodcastNetwork
+OBJDIR = obj
 
-TestView.o: TestView.h TestView.cc TestControl.o
+############## Do not change anything from here downwards! #############
+SRC = $(wildcard $(SRCDIR)/*$(EXT))
+OBJ = $(SRC:$(SRCDIR)/%$(EXT)=$(OBJDIR)/%.o)
+DEP = $(OBJ:$(OBJDIR)/%.o=%.d)
+# UNIX-based OS variables & settings
+RM = rm
+DELOBJ = $(OBJ)
+# Windows OS variables & settings
+DEL = del
+EXE = .exe
+WDELOBJ = $(SRC:$(SRCDIR)/%$(EXT)=$(OBJDIR)\\%.o)
 
-TestControl.o: TestControl.h TestControl.cc Network.o
-	g++ -c TestControl.cc
+########################################################################
+####################### Targets beginning here #########################
+########################################################################
 
-Client.o: Client.h Client.cc Network.o
-	g++ -c Client.cc
+all: $(APPNAME)
 
-Network.o: Network.h Network.cc PodArray.o
-	g++ -c Network.cc
+# Builds the app
+$(APPNAME): $(OBJ)
+	$(CC) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-Subscriber.o: Subscriber.h Subscriber.cc
-	g++ -c Subscriber.cc
+# Creates the dependecy rules
+%.d: $(SRCDIR)/%$(EXT)
+	@$(CPP) $(CFLAGS) $< -MM -MT $(@:%.d=$(OBJDIR)/%.o) >$@
 
-PodArray.o: PodArray.cc PodArray.h Podcast.o
-	g++ -c PodArray.cc
+# Includes all .h files
+-include $(DEP)
 
-Podcast.o: Podcast.cc Podcast.h Episode.h
-	g++ -c Podcast.cc
-	
-Episode.o: Episode.cc Episode.h Podcast.h
-	g++ -c Episode.cc
+# Building rule for .o files and its .c/.cpp in combination with all .h
+$(OBJDIR)/%.o: $(SRCDIR)/%$(EXT)
+	$(CC) $(CXXFLAGS) -o $@ -c $<
 
+################### Cleaning rules for Unix-based OS ###################
+# Cleans complete project
+.PHONY: clean
 clean:
-	rm -f a2 *.o	
+	$(RM) $(DELOBJ) $(DEP) $(APPNAME)
 
+# Cleans only all files with the extension .d
+.PHONY: cleandep
+cleandep:
+	$(RM) $(DEP)
+
+#################### Cleaning rules for Windows OS #####################
+# Cleans complete project
+.PHONY: cleanw
+cleanw:
+	$(DEL) $(WDELOBJ) $(DEP) $(APPNAME)$(EXE)
+
+# Cleans only all files with the extension .d
+.PHONY: cleandepw
+cleandepw:
+	$(DEL) $(DEP)

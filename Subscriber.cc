@@ -6,7 +6,8 @@ using namespace std;
 
 //consturctor to initialize member variables
 Subscriber::Subscriber(const string& name, const string& creditcard){
-
+    this->name = name;
+    this->creditcard = creditcard;
 }
 
 //functions
