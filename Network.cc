@@ -1,22 +1,29 @@
 #include "Network.h"
 using namespace std;
 
-Network:: Network(){
-    name = "Network name";
+Network:: Network(const string& networkName){
+    this->name = networkName;
     podarray = new PodArray;
-    Subscriber * subs[MAX_SUBS];
+    //Subscriber * subs[MAX_SUBS];
     numSubs = 0;
+    // Initialize the subscriber array to nullptr
+    for (int i = 0; i < MAX_SUBS; ++i) {
+        subs[i] = nullptr;
+    }
 }
 
-Network::~Network(){
-    for(int i = 0; i < numSubs; ++i){
+Network::~Network() {
+    for (int i = 0; i < numSubs; ++i) {
         delete subs[i];
+        subs[i] = nullptr;  // Prevent dangling pointer
     }
+    
     delete podarray;
+    podarray = nullptr;  // Prevent accidental use
 }
 
 bool Network:: getPodcast(const string& title, Podcast** pod){
-    return podarray-> getPodcast(title, pod)
+    return podarray-> getPodcast(title, pod);
 }
 
 bool Network:: addPodcast(const string& podcastTitle, const string& host){
@@ -56,7 +63,7 @@ bool Network::addEpisode(const string& podcastTitle, const string& episodeTitle,
     return false;
 }
 
-bool Network:: addSubscriber(const string& name, const string* creditcard){
+bool Network:: addSubscriber(const string& name, const string& creditcard){
     if(numSubs >= MAX_SUBS){
         return false;
     }
@@ -69,11 +76,11 @@ bool Network:: addSubscriber(const string& name, const string* creditcard){
 bool Network::download(const string& subscriber, const string& podcastTitle, Podcast** podcast) {
     // Step 1: Check if the subscriber exists
     bool subscriberFound = false;
-    Subscriber* sub = nullptr;
+    //Subscriber* sub = nullptr;
     
     for (int i = 0; i < numSubs; ++i) {
         if (subs[i]->matches(subscriber)) {
-            sub = subs[i];
+            //sub = subs[i];
             subscriberFound = true;
             break;
         }
@@ -84,33 +91,23 @@ bool Network::download(const string& subscriber, const string& podcastTitle, Pod
         return false;  // Return false if subscriber not found
     }
 
-    // Step 2: Check if the podcast exists
-    Podcast* pod = nullptr;
-    for (int i = 0; i < podarray->size(); ++i) {
-        if (podarray->getPodcast(i)->getTitle() == podcastTitle) {
-            pod = podarray->getPodcast(i);
-            break;
-        }
-    }
-
-    if (pod == nullptr) {
+    if (!podarray->getPodcast(podcastTitle, podcast)) {
         cout << "Error: No such podcast found: " << podcastTitle << endl;
         return false;  // Return false if podcast not found
     }
 
-    // Step 3: Assign the podcast to the output parameter and return true
-    *podcast = pod;
+    // Step 3: Successfully found the podcast, so return true
     return true;  // Successfully returned the podcast
 }
 
 bool Network::stream(const string& subscriber, const string& podcastTitle, int episodeNum, Episode** ep) {
     // Step 1: Check if the subscriber exists
     bool subscriberFound = false;
-    Subscriber* sub = nullptr;
+    //Subscriber* sub = nullptr;
     
     for (int i = 0; i < numSubs; ++i) {
         if (subs[i]->matches(subscriber)) {
-            sub = subs[i];
+            //sub = subs[i];
             subscriberFound = true;
             break;
         }
@@ -135,7 +132,10 @@ bool Network::stream(const string& subscriber, const string& podcastTitle, int e
     }
 
     // Step 4: Get the episode from the podcast
-    *ep = pod->getEpisode(episodeNum - 1);  // Assuming episode number is 1-based and getEpisode takes 0-based index
+    if (!pod->getEpisode(episodeNum - 1, ep)) {
+        cout << "Error: Episode not found!" << endl;
+        return false;
+    }  // Assuming episode number is 1-based and getEpisode takes 0-based index
 
     // Step 5: Successfully found and returned the episode
     return true;

@@ -12,7 +12,7 @@
 class Network{
     public:
     //constructor 
-    Network();
+    Network(const string& name);
     //destructor
     ~Network();
 
@@ -23,7 +23,7 @@ class Network{
     //add and remove
     bool removePodcast(const string& title);
     bool addEpisode(const string& podcastTitle, const string& episodeTitle, const string& content);
-    bool addSubscriber(const string& name, const string* creditcard);
+    bool addSubscriber(const string& name, const string& creditcard);
 
     //client services
     bool download(const string& subscriber, const string& podcasttitle, Podcast** podcast);

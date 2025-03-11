@@ -5,6 +5,7 @@
 #include <string>
 #include "Episode.h"
 #include "defs.h"
+#include "PodArray.h"
 using namespace std;
 
 class Podcast{
